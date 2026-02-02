@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+/* Import fonts via standard CSS */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@theme {
+  /* Design System Tokens */
+  --radius-xl: 0.75rem;
+
+  /* Mapping your custom variables to Tailwind's theme system */
+  --color-background: hsl(222 47% 6%);
+  --color-foreground: hsl(210 40% 98%);
+
+  --color-card: hsl(222 47% 8%);
+  --color-card-foreground: hsl(210 40% 98%);
+
+  --color-primary: hsl(160 84% 39%);
+  --color-primary-foreground: hsl(222 47% 6%);
+
+  --color-secondary: hsl(217 33% 17%);
+  --color-muted: hsl(217 33% 15%);
+  --color-muted-foreground: hsl(215 20% 55%);
+
+  --color-accent: hsl(217 33% 20%);
+  --color-border: hsl(217 33% 18%);
+  --color-ring: hsl(160 84% 39%);
+
+  --color-warning: hsl(38 92% 50%);
+  --color-destructive: hsl(0 84% 60%);
+
+  /* ELD Specific Colors */
+  --color-eld-off-duty: hsl(215 20% 35%);
+  --color-eld-sleeper: hsl(262 60% 50%);
+  --color-eld-driving: hsl(160 84% 45%);
+  --color-eld-on-duty: hsl(38 92% 50%);
+
+  /* Custom Animations */
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Base Styles */
+@layer base {
+  *,
+  ::after,
+  ::before {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", sans-serif;
+  }
+
+  .font-mono {
+    font-family: "JetBrains Mono", monospace;
+  }
+}
+
+/* Components */
+@layer components {
+  /* Fix 1: Grouping glass styles to avoid unknown utility errors */
+  .glass-panel,
+  .stat-card {
+    background-color: hsl(222 47% 11% / 0.7);
+    backdrop-filter: blur(24px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    @apply border border-white/10 rounded-xl;
+  }
+
+  .stat-card {
+    @apply p-5 transition-all duration-300 hover:border-primary/30;
+  }
+
+  .eld-grid-cell {
+    @apply border-r border-border/30 transition-colors duration-150;
+  }
+
+  .eld-status-line {
+    @apply absolute h-1 rounded-full transition-all duration-300;
+  }
+
+  .input-glass {
+    @apply bg-secondary/50 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-all duration-200;
+  }
+
+  .tab-trigger-custom {
+    @apply px-6 py-3 text-sm font-medium text-muted-foreground transition-all duration-200 border-b-2 border-transparent;
+
+    &[data-state="active"] {
+      @apply text-primary border-primary;
+    }
+  }
+
+  /* Fix 2: Grouping badge styles to avoid recursive @apply errors */
+  .compliance-badge,
+  .compliance-badge-success,
+  .compliance-badge-warning {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .compliance-badge-success {
+    @apply bg-primary/20 text-primary;
+  }
+
+  .compliance-badge-warning {
+    @apply bg-warning/20 text-warning;
+  }
+}
+
+/* Utilities */
+@layer utilities {
+  .text-gradient {
+    @apply bg-linear-to-r from-primary to-emerald-400 bg-clip-text text-transparent;
+  }
+
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-muted) transparent;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-muted);
+      border-radius: 3px;
+    }
+  }
+}
