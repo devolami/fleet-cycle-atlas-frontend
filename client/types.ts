@@ -71,3 +71,8 @@ export type StatCardProps = {
     variant: "success" | "warning";
   };
 };
+
+export type CustomMarkerProps = {
+  type: "origin" | "destination" | "pickup" | "fuel" | "rest" | "current";
+  label?: string;
+};

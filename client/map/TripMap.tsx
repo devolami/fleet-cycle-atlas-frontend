@@ -1,115 +1,36 @@
 "use client";
 
-import React, { useState, useEffect, useRef, RefObject } from "react";
-
+import { LngLatBounds } from "mapbox-gl";
+import React, { useEffect, useRef, useState } from "react";
+import type { RefObject } from "react";
 import Map, {
-  Marker,
   FullscreenControl,
   GeolocateControl,
+  Layer,
+  Marker,
   NavigationControl,
   Source,
-  Layer,
-  MapRef,
-  LayerProps,
 } from "react-map-gl/mapbox";
-
-import { LngLatBounds } from "mapbox-gl";
-
-import { Fuel, MapPin, Building2, BedDouble, Navigation } from "lucide-react";
+import type { MapRef } from "react-map-gl/mapbox";
 
 import { useRoute } from "../contexts";
+import { useMapConfig } from "./useMapConfig";
+
+import { CustomFuelMarker, CustomMarker } from "./CustomMarker";
+import { LegendPanel } from "./LegendPanel";
 
 const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN as string;
 
-type CustomMarkerProps = {
-  type: "origin" | "destination" | "pickup" | "fuel" | "rest" | "current";
-  label?: string;
-};
-
-const markerStyles: Record<CustomMarkerProps["type"], string> = {
-  origin:
-    "bg-secondary text-[hsl(160,100%,50%)] shadow-[0_0_12px_hsl(160,100%,40%,0.6)]",
-  destination:
-    "bg-secondary text-[hsl(350,85%,60%)] shadow-[0_0_12px_hsl(350,85%,55%,0.6)]",
-  pickup:
-    "bg-secondary text-[hsl(220,90%,60%)] shadow-[0_0_12px_hsl(220,90%,55%,0.6)]",
-  fuel: "bg-secondary text-[hsl(25,95%,55%)] shadow-[0_0_12px_hsl(25,95%,50%,0.6)]",
-  rest: "bg-secondary text-[hsl(270,75%,60%)] shadow-[0_0_12px_hsl(270,75%,55%,0.6)]",
-  current:
-    "bg-secondary text-[hsl(160,100%,50%)] animate-pulse shadow-[0_0_16px_hsl(160,100%,40%,0.7)]",
-};
-
-const markerIcons: Record<CustomMarkerProps["type"], React.ElementType> = {
-  origin: MapPin,
-  destination: Building2,
-  pickup: Building2,
-  fuel: Fuel,
-  rest: BedDouble,
-  current: Navigation,
-};
-
-function CustomMarker({ type, label }: CustomMarkerProps) {
-  const Icon = markerIcons[type];
-
-  return (
-    <div className="relative group cursor-pointer">
-      <div
-        className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110 ${markerStyles[type]}`}
-      >
-        <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
-      </div>
-      {/* Pulse ring for origin/destination */}
-      {(type === "origin" || type === "destination" || type === "current") && (
-        <div
-          className={`absolute inset-0 rounded-full animate-ping opacity-30 ${
-            type === "origin" || type === "current"
-              ? "bg-primary"
-              : "bg-success"
-          }`}
-          style={{ animationDuration: "2s" }}
-        />
-      )}
-      {/* Tooltip */}
-      {label && (
-        <div className="absolute left-1/2 -translate-x-1/2 -top-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-          <div className="bg-secondary text-popover-foreground text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl border border-border/50 backdrop-blur-sm">
-            {label}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function CustomFuelMarker({ type, label }: CustomMarkerProps) {
-  const Icon = markerIcons[type];
-
-  return (
-    <div className="relative group cursor-pointer">
-      <div
-        className={`w-8 h-8 lg:w-10 lg:h-10 rounded-full flex items-center justify-center transition-transform duration-200 hover:scale-110 ${markerStyles[type]}`}
-      >
-        <Icon className="w-4 h-4 lg:w-5 lg:h-5" />
-      </div>
-      {/* Tooltip */}
-      {label && (
-        <div className="absolute left-1/2 -translate-x-1/2 -top-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50">
-          <div className="bg-secondary text-popover-foreground text-xs px-3 py-1.5 rounded-lg whitespace-nowrap shadow-xl border border-border/50 backdrop-blur-sm">
-            {label}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function TripMap() {
+  const { routeCoordinates, calculateFuelingMarkers, fuelingMarkersRef } =
+    useRoute();
   const {
-    routeCoordinates,
-    coords,
-    calculateFuelingMarkers,
-    fuelingMarkersRef,
-  } = useRoute();
+    geojson,
+    routeLineStyle,
+    routeGlowStyle,
+    getMarkerType,
+    getMarkerLabel,
+  } = useMapConfig();
 
   const [viewState, setViewState] = useState({
     longitude: routeCoordinates[0].longitude,
@@ -118,55 +39,6 @@ function TripMap() {
   });
   const mapRef: RefObject<MapRef | null> = useRef(null);
   const fuelingMarkers = fuelingMarkersRef.current;
-
-  const geojson: GeoJSON.FeatureCollection<GeoJSON.LineString> = {
-    type: "FeatureCollection",
-    features:
-      coords?.length > 0
-        ? [
-            // Only add the feature if we have coords
-            {
-              type: "Feature",
-              geometry: {
-                type: "LineString",
-                coordinates: coords,
-              },
-              properties: {},
-            },
-          ]
-        : [],
-  };
-
-  // Route line style matching the design system
-  const routeLineStyle: LayerProps = {
-    id: "trip-route-line",
-    type: "line",
-    layout: {
-      "line-join": "round",
-      "line-cap": "round",
-    },
-    paint: {
-      "line-color": "#10b981", // primary emerald color
-      "line-width": 4,
-      "line-opacity": 0.9,
-    },
-  };
-
-  // Glow effect layer under the main route
-  const routeGlowStyle: LayerProps = {
-    id: "trip-route-glow",
-    type: "line",
-    layout: {
-      "line-join": "round",
-      "line-cap": "round",
-    },
-    paint: {
-      "line-color": "#10b981",
-      "line-width": 12,
-      "line-opacity": 0.2,
-      "line-blur": 8,
-    },
-  };
 
   useEffect(() => {
     const fetchRoutes = async () => {
@@ -184,23 +56,6 @@ function TripMap() {
     }
     fetchRoutes();
   }, [routeCoordinates]);
-
-  // Get marker type based on index
-  const getMarkerType = (
-    index: number,
-    total: number,
-  ): CustomMarkerProps["type"] => {
-    if (index === 0) return "origin";
-    if (index === total - 1) return "destination";
-    return "pickup";
-  };
-
-  // Get marker label based on index
-  const getMarkerLabel = (index: number, total: number): string => {
-    if (index === 0) return "Current Location";
-    if (index === total - 1) return "Drop-off";
-    return `Pickup`;
-  };
 
   return (
     <div className="glass-panel h-75 sm:h-87.5 lg:h-112.5 overflow-hidden">
@@ -256,50 +111,7 @@ function TripMap() {
       </Map>
 
       {/* Legend Panel */}
-      <div className="absolute bottom-3 lg:bottom-4 left-10 lg:left-50 glass-panel p-2.5 lg:p-3 space-y-1.5 lg:space-y-2 z-20">
-        <p className="text-[10px] lg:text-xs font-medium text-white mb-1.5 lg:mb-2">
-          Route Legend
-        </p>
-        <div className="flex flex-wrap gap-2.5 lg:gap-3 text-[10px] lg:text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[hsl(160,100%,40%)] flex items-center justify-center">
-              <MapPin className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-white" />
-            </div>
-            <span className="text-white">Current location</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[hsl(350,85%,55%)] flex items-center justify-center">
-              <Building2 className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-white" />
-            </div>
-            <span className="text-white">Drop-off</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[hsl(25,95%,50%)] flex items-center justify-center">
-              <Fuel className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-white" />
-            </div>
-            <span className="text-white">Fuel</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <div className="w-3.5 h-3.5 lg:w-4 lg:h-4 rounded-full bg-[hsl(220,90%,55%)] flex items-center justify-center">
-              <Building2 className="w-2 h-2 lg:w-2.5 lg:h-2.5 text-white" />
-            </div>
-            <span className="text-white">Pickup</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Distance Indicator Panel */}
-      <div className="absolute top-3 lg:top-4 right-3 lg:right-4 glass-panel px-3 lg:px-4 py-2 lg:py-2.5 z-20">
-        <p className="text-[10px] lg:text-xs text-muted-foreground">
-          Live Route
-        </p>
-        <div className="flex items-center gap-1.5">
-          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          <p className="text-sm lg:text-base font-mono font-semibold text-foreground">
-            Active
-          </p>
-        </div>
-      </div>
+      <LegendPanel />
     </div>
   );
 }
