@@ -1,3 +1,4 @@
+import { LucideIcon } from "lucide-react";
 import {
   UseFormRegister,
   FieldErrors,
@@ -12,24 +13,9 @@ export type InputData = {
   current_cycle_hours: number;
 };
 
-export type InputConfigProps = {
-  name: keyof InputData;
-  type: string;
-  placeholder?: string;
-  id: string;
-  validationRules?: RegisterOptions<InputData>;
-  description?: string;
-  label: string;
-};
 export type Coordinates = {
   latitude: number;
   longitude: number;
-};
-export type InputFieldProps = {
-  config: InputConfigProps[];
-  register: UseFormRegister<InputData>;
-  errors: FieldErrors<InputData>;
-  setValue: UseFormSetValue<InputData>;
 };
 
 export type LogEntry = {
@@ -46,4 +32,42 @@ export type Logbook = {
   timeSpentInOnDuty: number;
   timeSpentInDriving: number;
   timeSpentInSleeperBerth: number;
+};
+
+export type InputConfigProps = {
+  name: keyof TripValueProps;
+  placeholder: string;
+  id: string;
+  icon: React.ComponentType<any>;
+  label: string;
+  validationRules: RegisterOptions<TripValueProps>;
+};
+export type InputFieldProps = {
+  config: InputConfigProps[];
+  register: UseFormRegister<TripValueProps>;
+  errors: FieldErrors<TripValueProps>;
+  setValue: UseFormSetValue<TripValueProps>;
+};
+export type TripValueProps = {
+  current_location: string;
+  pickup_location: string;
+  drop_off_location: string;
+  current_cycle_hours: number;
+};
+
+export type MapMarker = {
+  type: "fuel" | "rest" | "pickup" | "dropoff" | "current";
+  label: string;
+  position: { top: string; left: string };
+};
+
+export type StatCardProps = {
+  icon: LucideIcon;
+  label: string;
+  value: string;
+  subValue?: string;
+  badge?: {
+    text: string;
+    variant: "success" | "warning";
+  };
 };

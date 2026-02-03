@@ -1,16 +1,6 @@
-import { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface StatCardProps {
-  icon: LucideIcon;
-  label: string;
-  value: string;
-  subValue?: string;
-  badge?: {
-    text: string;
-    variant: "success" | "warning";
-  };
-}
+import { StatCardProps } from "@/client/types";
 
 export function StatCard({
   icon: Icon,

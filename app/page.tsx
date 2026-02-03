@@ -1,17 +1,20 @@
-// import type { Metadata } from "next";
+import type { Metadata } from "next";
+
 import { RouteProvider } from "@/client/contexts";
-import { Home } from "@/client/components";
 
-// const siteURL: string = process.env.NEXT_PUBLIC_SITE_URL as string
+import Home from "@/client/components/dashboard/Home";
 
-// export const metadata: Metadata = {
-//   metadataBase: new URL(siteURL),
-//   title: "Home | TripPlanner",
-//   description: "Plan your trip, generate map routes and logbook",
-//   alternates: {
-//     canonical: `${siteURL}`,
-//   },
-// }
+const siteURL: string = process.env.NEXT_PUBLIC_SITE_URL as string;
+
+export const metadata: Metadata = {
+  metadataBase: new URL(siteURL),
+  title: "Home | TripPlanner",
+  description: "Plan your trip, generate map routes and logbook",
+  alternates: {
+    canonical: `${siteURL}`,
+  },
+};
+
 export default function Page() {
   return (
     <RouteProvider>

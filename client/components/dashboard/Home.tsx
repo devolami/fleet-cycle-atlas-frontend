@@ -1,12 +1,15 @@
 "use client";
+
 import { useState } from "react";
 import { Clock, Map, ShieldCheck, Fuel } from "lucide-react";
+
+import { useRoute } from "@/client/contexts";
+
 import { InputSidebar } from "./InputSideBar";
 import { StatCard } from "./StatCard";
 import { MapPlaceholder } from "./MapPlaceholder";
-import { useRoute } from "@/client/contexts";
 
-const DashboardHome = () => {
+const Home = () => {
   const { tripInfoRef, logData, tripRouteInfo } = useRoute();
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(true);
@@ -78,8 +81,8 @@ const DashboardHome = () => {
                 Trip Simulation
               </h1>
               <p className="text-xs lg:text-sm text-muted-foreground">
-                {tripRouteInfo.current} → {tripRouteInfo.drop_off} •{" "}
-                {total_distance_miles} miles
+                {tripRouteInfo.current_location} →{" "}
+                {tripRouteInfo.drop_off_location} • {total_distance_miles} miles
               </p>
             </div>
             <div className="text-left sm:text-right">
@@ -112,7 +115,6 @@ const DashboardHome = () => {
             </div>
           )}
 
-         
           {isLoading && (
             <div className="glass-panel p-8 lg:p-12 flex flex-col items-center justify-center gap-4">
               <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full border-4 border-primary/30 border-t-primary animate-spin" />
@@ -127,4 +129,4 @@ const DashboardHome = () => {
   );
 };
 
-export default DashboardHome;
+export default Home;

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, RefObject } from "react";
+
 import Map, {
   Marker,
   FullscreenControl,
@@ -12,18 +13,18 @@ import Map, {
   LayerProps,
 } from "react-map-gl/mapbox";
 
+import { LngLatBounds } from "mapbox-gl";
+
 import { Fuel, MapPin, Building2, BedDouble, Navigation } from "lucide-react";
 
 import { useRoute } from "../contexts";
-import { LngLatBounds } from "mapbox-gl"; // Import LngLatBounds
 
 const ACCESS_TOKEN: string = process.env.NEXT_PUBLIC_ACCESS_TOKEN as string;
 
-// Custom marker component matching the design system
-interface CustomMarkerProps {
+type CustomMarkerProps = {
   type: "origin" | "destination" | "pickup" | "fuel" | "rest" | "current";
   label?: string;
-}
+};
 
 const markerStyles: Record<CustomMarkerProps["type"], string> = {
   origin:

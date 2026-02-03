@@ -1,12 +1,9 @@
 import { Fuel, BedDouble, Building2, MapPin } from "lucide-react";
-import { useRoute } from "@/client/contexts";
-import { MapLog } from "../Home";
 
-interface MapMarker {
-  type: "fuel" | "rest" | "pickup" | "dropoff" | "current";
-  label: string;
-  position: { top: string; left: string };
-}
+import { useRoute } from "@/client/contexts";
+
+import { MapLog } from "./MapLog";
+import { MapMarker } from "@/client/types";
 
 const markers: MapMarker[] = [
   {

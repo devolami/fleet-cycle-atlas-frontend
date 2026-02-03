@@ -1,18 +1,18 @@
 "use client";
+
 import React, {
   createContext,
   useState,
   useContext,
-  useCallback,
   useRef,
   useEffect,
 } from "react";
-import { Coordinates } from "../form";
+
+import { Coordinates, Logbook } from "../types";
 
 import { along, lineString } from "@turf/turf";
-import { Logbook } from "../form";
 
-interface RouteContextType {
+type RouteContextType = {
   routeCoordinates: Coordinates[];
   setRouteCoordinates: React.Dispatch<React.SetStateAction<Coordinates[]>>;
   errorData: string;
@@ -32,7 +32,7 @@ interface RouteContextType {
     React.SetStateAction<Record<string, string | null>>
   >;
   setLogData: React.Dispatch<React.SetStateAction<Logbook[] | null>>;
-}
+};
 
 const RouteContext = createContext<RouteContextType | undefined>(undefined);
 
@@ -64,9 +64,9 @@ export const RouteProvider: React.FC<{ children: React.ReactNode }> = ({
   const [tripRouteInfo, setTripRouteInfo] = useState<
     Record<string, string | null>
   >({
-    current: "Chicago, IL",
-    pickup: "Indianapolis, IN",
-    drop_off: "Atlanta, GA",
+    current_location: "Chicago, IL",
+    pickup_location: "Indianapolis, IN",
+    drop_off_location: "Atlanta, GA",
   });
 
   const tripInfoRef = useRef(tripInfo);
